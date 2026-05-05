@@ -285,7 +285,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Trash2, Plus, Search, LayoutDashboard, History, Dumbbell, X, 
   ArrowUpRight, Wallet, Calendar, User, Phone, CreditCard, Banknote, AlertCircle, Clock, MessageCircle,
-  Pencil // تم إضافة استيراد أيقونة القلم هنا
+  Pencil 
 } from 'lucide-react';
 import { db } from './lib/firebase'; 
 import { ref, set, onValue, remove, off } from "firebase/database";
@@ -293,7 +293,7 @@ import { ref, set, onValue, remove, off } from "firebase/database";
 export default function MuscleHouseApp() {
   const [members, setMembers] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('all'); // all, debt, expired
+  const [filterType, setFilterType] = useState('all'); 
   const [activeTab, setActiveTab] = useState('members');
   const [isMounted, setIsMounted] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -320,7 +320,6 @@ export default function MuscleHouseApp() {
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
-  // 1. إرسال SMS (تم تعديل النص حسب طلبك)
   const sendDirectSMS = (m: any) => {
     const message = `كابتن ${m.name}، نذكرك بتجديد اشتراكك في Muscle House. يرجى التواصل مع الادارة، دمتم بخير.`;
     const smsUrl = `sms:${m.phone}?body=${encodeURIComponent(message)}`;
@@ -328,7 +327,7 @@ export default function MuscleHouseApp() {
   };
 
   const sendWhatsApp = (m: any) => {
-    const message = `مرحباً كابتن ${m.name} 🏋️‍♂️، نود تذكيرك بأن اشتراكك في Muscle House ينتهي بتاريخ ${m.endDate}. ننتظرك لتجديد نشاطك!`;
+    const message = `كابتن ${m.name} نذكرك بتجديد اشتراكك في نادي Muscle House دمتم بخير`;
     const waUrl = `https://wa.me/${m.phone}?text=${encodeURIComponent(message)}`;
     window.open(waUrl, '_blank');
   };
@@ -399,7 +398,6 @@ export default function MuscleHouseApp() {
           </div>
           <div className="text-left leading-none">
             <span className="text-[#00FF88] text-2xl font-black">
-              {/* التعديل: حساب اللاعبين غير المنتهية اشتراكاتهم فقط */}
               {members.filter(m => getDaysLeft(m.endDate) > 0).length}
             </span>
             <p className="text-[8px] text-gray-500 uppercase font-bold">Active Athletes</p>
@@ -441,7 +439,6 @@ export default function MuscleHouseApp() {
                       </div>
                       
                       <div className="flex gap-2">
-                        {/* زر التعديل: تم تغيير الأيقونة إلى Pencil وإزالة التدوير */}
                         <button onClick={() => startEditing(m)} className="p-2.5 bg-[#00FF88]/10 rounded-full text-[#00FF88] hover:bg-[#00FF88]/20 transition-all" title="تعديل">
                           <Pencil size={16} />
                         </button>
