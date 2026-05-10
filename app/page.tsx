@@ -1,4 +1,6 @@
 
+
+
 // "use client";
 // import React, { useState, useEffect } from 'react';
 // import { 
@@ -40,7 +42,8 @@
 //   };
 
 //   const sendDirectSMS = (m: any) => {
-//     const message = `كابتن ${m.name}، نذكرك بتجديد اشتراكك في Muscle House. يرجى التواصل مع الادارة، دمتم بخير.`;
+//     // تم تعديل نص الـ SMS هنا
+//     const message = `كابتن ${m.name} نذكرك بتجديد اشتراكك في نادي Muscle House دمتم بخير`;
 //     const smsUrl = `sms:${m.phone}?body=${encodeURIComponent(message)}`;
 //     window.location.href = smsUrl;
 //   };
@@ -298,12 +301,15 @@
 //   );
 // }
 
+
+
+
 "use client";
 import React, { useState, useEffect } from 'react';
 import { 
   Trash2, Plus, Search, LayoutDashboard, History, Dumbbell, X, 
-  ArrowUpRight, Wallet, Calendar, User, Phone, CreditCard, Banknote, AlertCircle, Clock, MessageCircle,
-  Pencil 
+  Wallet, Calendar, User, Phone, CreditCard, Banknote, AlertCircle, Clock, MessageCircle,
+  Pencil, Users 
 } from 'lucide-react';
 import { db } from './lib/firebase'; 
 import { ref, set, onValue, remove, off } from "firebase/database";
@@ -339,7 +345,6 @@ export default function MuscleHouseApp() {
   };
 
   const sendDirectSMS = (m: any) => {
-    // تم تعديل نص الـ SMS هنا
     const message = `كابتن ${m.name} نذكرك بتجديد اشتراكك في نادي Muscle House دمتم بخير`;
     const smsUrl = `sms:${m.phone}?body=${encodeURIComponent(message)}`;
     window.location.href = smsUrl;
@@ -355,9 +360,7 @@ export default function MuscleHouseApp() {
     if (!form.name || !form.endDate || !form.totalAmount) {
       return alert("⚠️ يرجى إدخال الاسم، المبلغ الإجمالي، وتاريخ الانتهاء");
     }
-    
     const targetId = editingId || Date.now().toString();
-    
     try {
       await set(ref(db, `members/${targetId}`), {
         ...form,
@@ -405,7 +408,7 @@ export default function MuscleHouseApp() {
       </div>
 
       <header className="p-8 pb-6 border-b border-white/[0.03] backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-md mx-auto flex justify-between items-center">
+        <div className="max-w-md mx-auto flex justify-center items-center">
           <div className="flex items-center gap-4">
             <div className="bg-gradient-to-br from-[#00FF88] to-[#00cc6d] p-2.5 rounded-2xl shadow-[0_0_20px_rgba(0,255,136,0.3)]">
               <Dumbbell size={26} className="text-black" />
@@ -414,12 +417,6 @@ export default function MuscleHouseApp() {
               <h1 className="text-2xl font-black tracking-tight leading-none italic uppercase">Muscle<span className="text-[#00FF88]">House</span></h1>
               <p className="text-[9px] text-gray-500 font-bold tracking-[0.4em] uppercase mt-1">Management System</p>
             </div>
-          </div>
-          <div className="text-left leading-none">
-            <span className="text-[#00FF88] text-2xl font-black">
-              {members.filter(m => getDaysLeft(m.endDate) > 0).length}
-            </span>
-            <p className="text-[8px] text-gray-500 uppercase font-bold">Active Athletes</p>
           </div>
         </div>
       </header>
@@ -443,12 +440,9 @@ export default function MuscleHouseApp() {
               {filteredMembers.map(m => {
                 const debt = Number(m.totalAmount) - Number(m.paidAmount);
                 const daysLeft = getDaysLeft(m.endDate);
-                const isUrgent = daysLeft <= 3 && daysLeft > 0;
                 const isExpired = daysLeft <= 0;
-
                 return (
                   <div key={m.id} className={`group bg-gradient-to-b from-[#0f1218] to-[#0a0c10] border rounded-[2.5rem] p-7 shadow-2xl relative overflow-hidden transition-all ${isExpired ? 'border-red-500/20 shadow-red-500/5' : 'border-white/[0.05]'}`}>
-                    
                     <div className="flex justify-between items-start relative z-10">
                       <div>
                         <h3 className="text-xl font-black mb-1">{m.name}</h3>
@@ -456,46 +450,31 @@ export default function MuscleHouseApp() {
                            <Phone size={10} className="text-[#00FF88]" /> {m.phone}
                         </div>
                       </div>
-                      
                       <div className="flex gap-2">
-                        <button onClick={() => startEditing(m)} className="p-2.5 bg-[#00FF88]/10 rounded-full text-[#00FF88] hover:bg-[#00FF88]/20 transition-all" title="تعديل">
+                        <button onClick={() => startEditing(m)} className="p-2 bg-[#00FF88]/10 rounded-full text-[#00FF88] hover:bg-[#00FF88]/20 transition-all">
                           <Pencil size={16} />
                         </button>
-                        <button onClick={() => sendWhatsApp(m)} className="p-2.5 bg-green-500/10 rounded-full text-green-500 hover:bg-green-500/20 transition-all" title="واتساب">
+                        <button onClick={() => sendWhatsApp(m)} className="p-2 bg-green-500/10 rounded-full text-green-500 hover:bg-green-500/20 transition-all">
                           <MessageCircle size={16} />
                         </button>
-                        <button onClick={() => sendDirectSMS(m)} className="p-2.5 bg-blue-500/10 rounded-full text-blue-500 hover:bg-blue-500/20 transition-all" title="رسالة SMS">
+                        {/* إعادة أيقونة الـ SMS هنا */}
+                        <button onClick={() => sendDirectSMS(m)} className="p-2 bg-blue-500/10 rounded-full text-blue-500 hover:bg-blue-500/20 transition-all">
                           <Banknote size={16} />
                         </button>
-                        <button onClick={() => confirm('حذف المشترك؟') && remove(ref(db, `members/${m.id}`))} className="p-2.5 bg-red-500/10 rounded-full text-red-500 hover:bg-red-500/20 transition-all">
+                        <button onClick={() => confirm('حذف المشترك؟') && remove(ref(db, `members/${m.id}`))} className="p-2 bg-red-500/10 rounded-full text-red-500 hover:bg-red-500/20 transition-all">
                           <Trash2 size={16} />
                         </button>
                       </div>
                     </div>
-
-                    <div className="mt-8 grid grid-cols-2 gap-4">
-                      <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-4 text-center">
-                        <p className="text-[9px] uppercase font-black text-gray-500 mb-1 tracking-tighter">المدفوع / الكلي</p>
+                    <div className="mt-8 grid grid-cols-2 gap-4 text-center">
+                      <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-4">
+                        <p className="text-[9px] uppercase font-black text-gray-500 mb-1">المدفوع / الكلي</p>
                         <p className="text-md font-mono text-white">{m.paidAmount} / {m.totalAmount}</p>
                       </div>
-                      <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-4 text-center">
+                      <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-4">
                         <p className="text-[9px] uppercase font-black text-gray-500 mb-1">المتبقي</p>
-                        <p className={`text-lg font-mono font-black ${debt > 0 ? 'text-orange-500' : 'text-[#00FF88]'}`}>
-                          {debt > 0 ? `${debt} ₪` : 'خالص'}
-                        </p>
+                        <p className={`text-lg font-mono font-black ${debt > 0 ? 'text-orange-500' : 'text-[#00FF88]'}`}>{debt > 0 ? `${debt} ₪` : 'خالص'}</p>
                       </div>
-                    </div>
-
-                    <div className="mt-6 pt-4 border-t border-white/[0.03] flex items-center justify-between">
-                       <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
-                          <Calendar size={12} className="text-[#00FF88]" />
-                          <span>تنتهي في: {m.endDate}</span>
-                       </div>
-                       
-                       <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${isExpired ? 'bg-red-500/10 text-red-500 animate-pulse' : isUrgent ? 'bg-orange-500/10 text-orange-500' : 'bg-white/5 text-gray-500'}`}>
-                          <Clock size={10} />
-                          {isExpired ? 'الاشتراك منتهي' : `باقي ${daysLeft} يوم`}
-                       </div>
                     </div>
                   </div>
                 );
@@ -511,7 +490,18 @@ export default function MuscleHouseApp() {
                 <p className="text-gray-500 text-[10px] mt-2 uppercase tracking-[0.3em] font-bold">الأداء المالي العام</p>
               </div>
               <div className="grid grid-cols-1 gap-6">
-                 <div className="bg-gradient-to-br from-[#0f1218] to-[#07090d] border border-white/5 rounded-[2.5rem] p-8 text-center relative">
+                 <div className="bg-gradient-to-br from-[#0f1218] to-[#07090d] border border-white/5 rounded-[2.5rem] p-8 text-center">
+                   <div className="flex justify-center items-center gap-3 mb-2 text-[#00cc6d]">
+                     <Users size={20} />
+                     <span className="text-[10px] font-black uppercase tracking-widest text-white">إجمالي المشتركين النشطين</span>
+                   </div>
+                   <p className="text-5xl font-mono font-black italic text-[#00cc6d]">
+                     {members.filter(m => getDaysLeft(m.endDate) > 0).length}
+                     <span className="text-lg ml-2 not-italic text-gray-500 font-sans font-normal">بطل</span>
+                   </p>
+                 </div>
+
+                 <div className="bg-gradient-to-br from-[#0f1218] to-[#07090d] border border-white/5 rounded-[2.5rem] p-8 text-center">
                    <div className="flex justify-center items-center gap-3 mb-2 text-[#00FF88]">
                      <Wallet size={20} />
                      <span className="text-[10px] font-black uppercase tracking-widest text-white">إجمالي المحصل</span>
@@ -529,7 +519,7 @@ export default function MuscleHouseApp() {
                    </div>
                    <div className="bg-[#0a0c10] border border-white/5 rounded-[2rem] p-6 text-center">
                      <CreditCard size={18} className="text-blue-500 mx-auto mb-2" />
-                     <p className="text-[8px] font-black text-gray-500 uppercase mb-1">عقود نشطة</p>
+                     <p className="text-[8px] font-black text-gray-500 uppercase mb-1">قيمة العقود النشطة</p>
                      <p className="text-2xl font-mono font-black">
                         {members.filter(m => getDaysLeft(m.endDate) > 0).reduce((acc, m) => acc + (Number(m.totalAmount) || 0), 0)} ₪
                      </p>
@@ -549,33 +539,17 @@ export default function MuscleHouseApp() {
             </div>
             <div className="space-y-6">
               <div className="space-y-4">
-                <div className="flex items-center gap-2 text-[10px] font-black text-[#00FF88] uppercase tracking-widest ml-2">
-                  <User size={14} /> المعلومات الأساسية
-                </div>
-                <input placeholder="الاسم الكامل" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full bg-[#0a0c10] border border-white/5 p-5 rounded-2xl outline-none focus:border-[#00FF88]/30" />
-                <input placeholder="رقم الموبايل" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} className="w-full bg-[#0a0c10] border border-white/5 p-5 rounded-2xl outline-none focus:border-[#00FF88]/30" />
+                <input placeholder="الاسم الكامل" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full bg-[#0a0c10] border border-white/5 p-5 rounded-2xl outline-none" />
+                <input placeholder="رقم الموبايل" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} className="w-full bg-[#0a0c10] border border-white/5 p-5 rounded-2xl outline-none" />
               </div>
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-[10px] font-black text-[#00FF88] uppercase tracking-widest ml-2">
-                  <CreditCard size={14} /> التفاصيل المالية (₪)
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <input type="number" placeholder="المبلغ الكلي" value={form.totalAmount} onChange={e => setForm({...form, totalAmount: e.target.value})} className="w-full bg-[#0a0c10] border border-white/5 p-5 rounded-2xl outline-none focus:border-[#00FF88]/30" />
-                  <input type="number" placeholder="المدفوع حالياً" value={form.paidAmount} onChange={e => setForm({...form, paidAmount: e.target.value})} className="w-full bg-[#0a0c10] border border-white/5 p-5 rounded-2xl outline-none focus:border-[#00FF88]/30" />
-                </div>
+              <div className="grid grid-cols-2 gap-4">
+                <input type="number" placeholder="المبلغ الكلي" value={form.totalAmount} onChange={e => setForm({...form, totalAmount: e.target.value})} className="w-full bg-[#0a0c10] border border-white/5 p-5 rounded-2xl outline-none" />
+                <input type="number" placeholder="المدفوع حالياً" value={form.paidAmount} onChange={e => setForm({...form, paidAmount: e.target.value})} className="w-full bg-[#0a0c10] border border-white/5 p-5 rounded-2xl outline-none" />
               </div>
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-[10px] font-black text-[#00FF88] uppercase tracking-widest ml-2">
-                  <Calendar size={14} /> نهاية الصلاحية
-                </div>
-                <input type="date" value={form.endDate} onChange={e => setForm({...form, endDate: e.target.value})} className="w-full bg-[#0a0c10] border border-white/5 p-5 rounded-2xl outline-none text-white text-xs uppercase" />
-              </div>
-              <button onClick={saveToFirebase} className="w-full bg-[#00FF88] text-black py-6 rounded-3xl font-black uppercase tracking-[0.2em] shadow-[0_20px_40px_rgba(0,255,136,0.15)] active:scale-[0.97] transition-all">
+              <input type="date" value={form.endDate} onChange={e => setForm({...form, endDate: e.target.value})} className="w-full bg-[#0a0c10] border border-white/5 p-5 rounded-2xl outline-none text-white text-xs uppercase" />
+              <button onClick={saveToFirebase} className="w-full bg-[#00FF88] text-black py-6 rounded-3xl font-black uppercase tracking-[0.2em] shadow-xl">
                 {editingId ? 'تحديث بيانات العقد' : 'اعتماد العقد الجديد'}
               </button>
-              {editingId && (
-                <button onClick={() => {setEditingId(null); setForm({ name: '', phone: '', startDate: '', endDate: '', totalAmount: '', paidAmount: '' }); setActiveTab('members');}} className="w-full text-gray-500 text-[10px] font-black uppercase tracking-widest">إلغاء التعديل</button>
-              )}
             </div>
           </div>
         )}
@@ -583,13 +557,13 @@ export default function MuscleHouseApp() {
 
       <div className="fixed bottom-0 inset-x-0 p-6 flex justify-center z-50 pointer-events-none">
         <nav className="bg-[#0a0c10]/90 backdrop-blur-2xl border border-white/10 p-2 rounded-[2.5rem] flex items-center gap-2 shadow-2xl pointer-events-auto">
-          <button onClick={() => {setEditingId(null); setActiveTab('members');}} className={`p-5 rounded-full transition-all duration-500 ${activeTab === 'members' ? 'bg-[#00FF88] text-black' : 'text-gray-500 hover:text-white'}`}>
+          <button onClick={() => {setEditingId(null); setActiveTab('members');}} className={`p-5 rounded-full ${activeTab === 'members' ? 'bg-[#00FF88] text-black' : 'text-gray-500'}`}>
             <LayoutDashboard size={24} />
           </button>
-          <button onClick={() => setActiveTab('add')} className={`p-5 rounded-full transition-all duration-500 ${activeTab === 'add' ? 'bg-[#00FF88] text-black scale-110' : 'text-gray-500 hover:text-white'}`}>
+          <button onClick={() => setActiveTab('add')} className={`p-5 rounded-full ${activeTab === 'add' ? 'bg-[#00FF88] text-black' : 'text-gray-500'}`}>
             <Plus size={24} />
           </button>
-          <button onClick={() => setActiveTab('history')} className={`p-5 rounded-full transition-all duration-500 ${activeTab === 'history' ? 'bg-[#00FF88] text-black' : 'text-gray-500 hover:text-white'}`}>
+          <button onClick={() => setActiveTab('history')} className={`p-5 rounded-full ${activeTab === 'history' ? 'bg-[#00FF88] text-black' : 'text-gray-500'}`}>
             <History size={24} />
           </button>
         </nav>
