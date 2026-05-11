@@ -282,9 +282,10 @@ export default function MuscleHouseApp() {
     return { daysRemaining, progress, isExpired: daysRemaining <= 0, isUrgent: daysRemaining <= 5 };
   };
 
-  // نص رسالة SMS المحدث
+
+// نص رسالة SMS المحدث حسب طلبك الأخير
   const sendDirectSMS = (m: any) => {
-    const message = `كابتن ${m.name}، نود تذكيرك بأن اشتراكك في Muscle House قد انتهى. يسعدنا استمرارك معنا! دمتم بخير.`;
+    const message = `كابتن ${m.name} نود تذكيرك بأن اشتراكك في نادي Muscle House قد انتهى، دمت بخير`;
     window.location.href = `sms:${m.phone}?body=${encodeURIComponent(message)}`;
   };
 
